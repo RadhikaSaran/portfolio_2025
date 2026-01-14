@@ -13,12 +13,12 @@
   </header>
 
   <main class="wrap">
-    <div id="book" class="book"></div>
+    <div id="book" class="book" aria-label="Portfolio flipbook"></div>
 
     <div class="controls">
-      <button id="prevBtn" type="button">← Prev</button>
+      <button id="prevBtn" type="button" aria-label="Previous page">← Prev</button>
       <div id="pageLabel" class="pageLabel">Loading…</div>
-      <button id="nextBtn" type="button">Next →</button>
+      <button id="nextBtn" type="button" aria-label="Next page">Next →</button>
     </div>
 
     <div id="errorBox" class="errorBox" hidden></div>
@@ -31,9 +31,8 @@
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
   </script>
 
-  <!-- PageFlip (pinned) -->
+  <!-- PageFlip (reliable CDN for GH Pages) -->
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
-
 
   <script src="script.js"></script>
 </body>
