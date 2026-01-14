@@ -3,27 +3,36 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Portfolio Flipbook</title>
+  <title>Radhika Saran Portfolio 2025</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-  <div class="topbar">
-    <button id="prevBtn" type="button" aria-label="Previous page">◀</button>
-    <div class="status">
-      <span id="pageLabel">Loading…</span>
-    </div>
-    <button id="nextBtn" type="button" aria-label="Next page">▶</button>
-  </div>
 
-  <main class="stage">
-    <div id="book" class="book" aria-label="Flipbook"></div>
+<body>
+  <header class="header">
+    <h1>Radhika Saran Portfolio 2025</h1>
+  </header>
+
+  <main class="wrap">
+    <div id="book" class="book"></div>
+
+    <div class="controls">
+      <button id="prevBtn" type="button">← Prev</button>
+      <div id="pageLabel" class="pageLabel">Loading…</div>
+      <button id="nextBtn" type="button">Next →</button>
+    </div>
+
+    <div id="errorBox" class="errorBox" hidden></div>
   </main>
 
-  <!-- PDF.js (render PDF pages) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.min.js"></script>
+  <!-- PDF.js (stable 2.x) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+  </script>
 
-  <!-- StPageFlip (page flip UI) -->
-  <script src="https://unpkg.com/page-flip/dist/js/page-flip.browser.min.js"></script>
+  <!-- PageFlip (pinned) -->
+  <script src="https://unpkg.com/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 
   <script src="script.js"></script>
 </body>
