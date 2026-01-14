@@ -47,40 +47,65 @@ async function init() {
     nextBtn.disabled = true;
     pageLabel.textContent = "Loading…";
 
-    // If PDF opens in browser, fetch should also be OK — but keep this anyway.
     const res = await fetch(PDF_URL, { cache: "no-store" });
     if (!res.ok) throw new Error(`PDF fetch failed: HTTP ${res.status}`);
 
     const pdfDoc = await pdfjsLib.getDocument(PDF_URL).promise;
     totalPages = pdfDoc.numPages;
 
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageLabel.textContent = `Rendering ${i} / ${totalPages}…`;
-      // eslint-disable-next-line no-await-in-loop
-      pages.push(await renderPage(pdfDoc, i));
-    }
+    // Prepare empty page divs (so PageFlip can initialize fast)
+    const pages = Array.from({ length: totalPages }, () => {
+      const d = document.createElement("div");
+      d.className = "page";
+      return d;
+    });
 
     if (!window.St || !St.PageFlip) throw new Error("PageFlip failed to load.");
 
     pageFlip = new St.PageFlip(bookEl, {
-      width: 600,
-      height: 780,
-      size: "stretch",
-      minWidth: 320,
-      maxWidth: 2400,
-      minHeight: 420,
-      maxHeight: 3000,
+      width: 720,
+      height: 960,
+      size: "fixed",
+      autoSize: true,
+      maxShadowOpacity: 0.25,
       showCover: true,
-      maxShadowOpacity: 0.2,
-      mobileScrollSupport: false,
       useMouseEvents: true,
+      mobileScrollSupport: false,
+      flippingTime: 700,
+      swipeDistance: 20
     });
 
     pageFlip.loadFromHTML(pages);
+
+    // Render function that fills a placeholder page div
+    const renderInto = async (i) => {
+      const pageNum = i + 1;
+      const page = await pdfDoc.getPage(pageNum);
+      const viewport = page.getViewport({ scale: RENDER_SCALE });
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d", { alpha: false });
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      // Replace content
+      pages[i].innerHTML = "";
+      pages[i].appendChild(canvas);
+
+      // Let PageFlip recalc sizes
+      try { pageFlip.update(); } catch (_) {}
+    };
+
+    // Render just enough to display immediately (cover + first spread)
+    await renderInto(0);
+    if (totalPages > 1) await renderInto(1);
+    if (totalPages > 2) await renderInto(2);
+
+    // Now enable controls and show page count
     pageFlip.on("flip", (e) => updateUI(e.data));
     updateUI(0);
-
     prevBtn.onclick = () => pageFlip.flipPrev();
     nextBtn.onclick = () => pageFlip.flipNext();
 
@@ -94,10 +119,20 @@ async function init() {
       try { pageFlip.update(); } catch (_) {}
     });
 
+    // Background render the rest (no UI spam)
+    (async () => {
+      for (let i = 3; i < totalPages; i++) {
+        try {
+          // Render progressively in idle time
+          await renderInto(i);
+        } catch (e) {
+          console.warn("Render failed page", i + 1, e);
+        }
+      }
+    })();
+
   } catch (err) {
     console.error(err);
     showError(String(err?.message || err));
   }
 }
-
-init();
