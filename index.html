@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portfolio Flipbook</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <button id="prevBtn" type="button" aria-label="Previous page">◀</button>
+    <div class="status">
+      <span id="pageLabel">Loading…</span>
+    </div>
+    <button id="nextBtn" type="button" aria-label="Next page">▶</button>
+  </div>
+
+  <main class="stage">
+    <div id="book" class="book" aria-label="Flipbook"></div>
+  </main>
+
+  <!-- PDF.js (render PDF pages) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.7.76/pdf.min.js"></script>
+
+  <!-- StPageFlip (page flip UI) -->
+  <script src="https://unpkg.com/page-flip/dist/js/page-flip.browser.min.js"></script>
+
+  <script src="script.js"></script>
+</body>
+</html>
