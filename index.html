@@ -12,26 +12,32 @@
     <h1>Radhika Saran Portfolio 2025</h1>
   </header>
 
-  <main class="wrap">
-    <div id="book" class="book" aria-label="Portfolio flipbook"></div>
+  <main class="stage">
+    <div class="bookWrap" id="bookWrap">
+      <div id="book" class="book" aria-label="Portfolio flipbook"></div>
 
-    <div class="controls">
-      <button id="prevBtn" type="button" aria-label="Previous page">← Prev</button>
-      <div id="pageLabel" class="pageLabel">Loading…</div>
-      <button id="nextBtn" type="button" aria-label="Next page">Next →</button>
+      <!-- overlay controls (appear on hover / always on touch) -->
+      <button id="prevBtn" class="nav navLeft" type="button" aria-label="Previous page">‹</button>
+      <button id="nextBtn" class="nav navRight" type="button" aria-label="Next page">›</button>
+
+      <div id="loading" class="loading">Loading…</div>
+    </div>
+
+    <div class="footer">
+      <div id="pageLabel" class="pageLabel" aria-live="polite"></div>
     </div>
 
     <div id="errorBox" class="errorBox" hidden></div>
   </main>
 
-  <!-- PDF.js (stable 2.x) -->
+  <!-- PDF.js (stable) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
   </script>
 
-  <!-- PageFlip (reliable CDN for GH Pages) -->
+  <!-- PageFlip (GH Pages-friendly CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 
   <script src="script.js"></script>

@@ -1,13 +1,17 @@
 const PDF_URL = "./portfolio.pdf";
 
-// Quality vs speed.
-// If it feels slow, set 1.8–2.0. If you want sharper, 2.2–2.4.
-const RENDER_SCALE = 2.0;
+/**
+ * Speed vs sharpness.
+ * If you want faster load, lower to 1.6–1.8.
+ * If you want sharper (slower), raise to 2.0.
+ */
+const RENDER_SCALE = 1.8;
 
 const bookEl = document.getElementById("book");
-const pageLabel = document.getElementById("pageLabel");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
+const pageLabel = document.getElementById("pageLabel");
+const loadingEl = document.getElementById("loading");
 const errorBox = document.getElementById("errorBox");
 
 let pageFlip = null;
@@ -16,9 +20,10 @@ let totalPages = 0;
 function showError(msg) {
   errorBox.hidden = false;
   errorBox.textContent = msg;
-  pageLabel.textContent = "Failed to load";
+  loadingEl.style.display = "none";
   prevBtn.disabled = true;
   nextBtn.disabled = true;
+  pageLabel.textContent = "Failed to load";
 }
 
 function updateUI(pageIndex0) {
@@ -28,7 +33,7 @@ function updateUI(pageIndex0) {
   nextBtn.disabled = human >= totalPages;
 }
 
-async function renderInto(pdfDoc, containerDiv, pageNum) {
+async function renderPageToDiv(pdfDoc, pageNum, div) {
   const page = await pdfDoc.getPage(pageNum);
   const viewport = page.getViewport({ scale: RENDER_SCALE });
 
@@ -40,24 +45,30 @@ async function renderInto(pdfDoc, containerDiv, pageNum) {
 
   await page.render({ canvasContext: ctx, viewport }).promise;
 
-  containerDiv.innerHTML = "";
-  containerDiv.appendChild(canvas);
+  div.innerHTML = "";
+  div.appendChild(canvas);
 }
 
+/**
+ * We render all pages first (no countdown, just a loading overlay),
+ * then initialize PageFlip with stable sizing.
+ * This avoids the hover-corner “glitch” caused by mode switching/empty pages.
+ */
 async function init() {
   try {
     errorBox.hidden = true;
+    loadingEl.style.display = "grid";
+    pageLabel.textContent = "";
     prevBtn.disabled = true;
     nextBtn.disabled = true;
-    pageLabel.textContent = "Loading…";
 
-    // Sanity check (fast fail if path/case wrong)
+    // Quick check: PDF must be reachable from GH Pages
     const res = await fetch(PDF_URL, { cache: "no-store" });
     if (!res.ok) {
       throw new Error(
         `Could not fetch ${PDF_URL} (HTTP ${res.status}).\n` +
         `Confirm this opens: your-site-url/portfolio.pdf\n` +
-        `Check filename/case exactly: portfolio.pdf`
+        `Check exact filename/case: portfolio.pdf`
       );
     }
 
@@ -67,35 +78,45 @@ async function init() {
     const pdfDoc = await pdfjsLib.getDocument(PDF_URL).promise;
     totalPages = pdfDoc.numPages;
 
-    // Create placeholder page divs so PageFlip can initialize immediately
+    // Create page divs
     const pageDivs = Array.from({ length: totalPages }, () => {
       const d = document.createElement("div");
       d.className = "page";
       return d;
     });
 
-    // Init flipbook fast
+    // Render all pages (quietly)
+    for (let i = 0; i < totalPages; i++) {
+      // no “Rendering 6/30” spam — just keep overlay
+      // eslint-disable-next-line no-await-in-loop
+      await renderPageToDiv(pdfDoc, i + 1, pageDivs[i]);
+    }
+
+    // Initialize flipbook
     pageFlip = new St.PageFlip(bookEl, {
-      width: 720,
-      height: 960,
-      size: "fixed",     // avoids weird stretch
-      autoSize: true,    // fits inside container
-      showCover: true,   // closed-book feel at first/last
-      maxShadowOpacity: 0.25,
-      flippingTime: 700,
-      swipeDistance: 20,
+      // These are SINGLE-PAGE dimensions; the spread is handled by the library.
+      width: 700,
+      height: 950,
+
+      size: "stretch",
+      minWidth: 350,
+      maxWidth: 2200,
+      minHeight: 450,
+      maxHeight: 3000,
+
+      showCover: true,      // cover single page at start/end (closed book feel)
+      usePortrait: false,   // IMPORTANT: never switch into single-page mode mid-book
+      autoSize: true,
+
+      maxShadowOpacity: 0.22,
+      flippingTime: 650,
       mobileScrollSupport: false,
       useMouseEvents: true
     });
 
     pageFlip.loadFromHTML(pageDivs);
 
-    // Render just enough pages for immediate use (cover + first spread)
-    await renderInto(pdfDoc, pageDivs[0], 1);
-    if (totalPages >= 2) await renderInto(pdfDoc, pageDivs[1], 2);
-    if (totalPages >= 3) await renderInto(pdfDoc, pageDivs[2], 3);
-
-    // Now enable UI
+    // Events + controls
     pageFlip.on("flip", (e) => updateUI(e.data));
     updateUI(0);
 
@@ -112,18 +133,8 @@ async function init() {
       try { pageFlip.update(); } catch (_) {}
     });
 
-    // Background render remaining pages quietly
-    (async () => {
-      for (let i = 3; i < totalPages; i++) {
-        try {
-          await renderInto(pdfDoc, pageDivs[i], i + 1);
-          // Update layout after each render (safe)
-          try { pageFlip.update(); } catch (_) {}
-        } catch (e) {
-          console.warn("Render failed for page", i + 1, e);
-        }
-      }
-    })();
+    // Done
+    loadingEl.style.display = "none";
 
   } catch (err) {
     console.error(err);
