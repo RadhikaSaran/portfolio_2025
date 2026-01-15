@@ -5,7 +5,7 @@ const PDF_URL = "./portfolio.pdf";
  * If you want faster load, lower to 1.6–1.8.
  * If you want sharper (slower), raise to 2.0.
  */
-const RENDER_SCALE = 1.8;
+const RENDER_SCALE = 1.6;
 
 const bookEl = document.getElementById("book");
 const prevBtn = document.getElementById("prevBtn");
