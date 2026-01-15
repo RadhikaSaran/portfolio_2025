@@ -95,8 +95,8 @@ async function init() {
     // Initialize flipbook
     pageFlip = new St.PageFlip(bookEl, {
       // These are SINGLE-PAGE dimensions; the spread is handled by the library.
-      width: 700,
-      height: 950,
+      width: 1400,
+      height: 990,
 
       size: "stretch",
       minWidth: 350,
