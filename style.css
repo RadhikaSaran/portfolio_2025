@@ -48,7 +48,7 @@ html, body{
 /* Book takes the available space, always fits one screen */
 .book{
   width: min(1400px, calc(100vw - (2 * var(--pad))));
-  height: calc(100vh - var(--headerH) - var(--footerH) - (2 * var(--pad)));
+  height: calc(100vh - var(--headerH) - var(--footerH) - (1 * var(--pad)));
   background: #fff;
   border: 1px solid rgba(0,0,0,0.10);
   border-radius: 14px;
@@ -130,7 +130,6 @@ html, body{
 
 /* CRITICAL: preserve aspect ratio, no stretching */
 .page canvas{
-  width: auto;
   height: 100%;
   max-width: 100%;
   object-fit: contain;
