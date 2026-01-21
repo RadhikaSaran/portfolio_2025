@@ -8,109 +8,36 @@
 </head>
 
 <body>
-  <!-- =========================
-       STICKY TOP NAV / HEADER
-       Edit links + title here
-  ========================== -->
-  <header class="header" role="banner">
-    <div class="headerInner">
-      <div class="brand">
-        <h1 class="siteTitle">Radhika Saran</h1>
-        <div class="siteSubtitle">Portfolio 2025</div>
-      </div>
-
-      <nav class="navBar" aria-label="Primary">
-        <!-- EDIT: change anchors/labels anytime -->
-        <a href="#work" class="navLink">Work</a>
-        <a href="#about" class="navLink">About</a>
-        <a href="#contact" class="navLink">Contact</a>
-        <a href="./portfolio.pdf" class="navLink" target="_blank" rel="noopener">PDF</a>
-      </nav>
-    </div>
+  <header class="header">
+    <h1>Radhika Saran Portfolio 2025</h1>
   </header>
 
-  <main class="page">
-    <!-- =========================
-         HERO / INTRO SECTION
-         Edit text + filmstrip images here
-    ========================== -->
-    <section class="hero" id="about">
-      <p class="heroLine">
-        <span class="heroEmph">I design systems</span> for environmental sensing, public health,
-        and the built world.
-      </p>
+  <main class="stage">
+    <div class="bookWrap" id="bookWrap">
+      <div id="book" class="book" aria-label="Portfolio flipbook"></div>
 
-      <!-- FILMSTRIP (horizontal scroll) -->
-      <div class="filmstrip" aria-label="Project photo filmstrip">
-        <!-- EDIT: replace src paths + captions -->
-        <figure class="filmItem">
-          <img src="./images/01.jpg" alt="Project 1 preview" loading="lazy">
-          <figcaption>Microfluidics</figcaption>
-        </figure>
+      <!-- overlay controls (appear on hover / always on touch) -->
+      <button id="prevBtn" class="nav navLeft" type="button" aria-label="Previous page">‹</button>
+      <button id="nextBtn" class="nav navRight" type="button" aria-label="Next page">›</button>
 
-        <figure class="filmItem">
-          <img src="./images/02.jpg" alt="Project 2 preview" loading="lazy">
-          <figcaption>Sensing</figcaption>
-        </figure>
+      <div id="loading" class="loading">Loading…</div>
+    </div>
 
-        <figure class="filmItem">
-          <img src="./images/03.jpg" alt="Project 3 preview" loading="lazy">
-          <figcaption>Built Systems</figcaption>
-        </figure>
+    <div class="footer">
+      <div id="pageLabel" class="pageLabel" aria-live="polite"></div>
+    </div>
 
-        <figure class="filmItem">
-          <img src="./images/04.jpg" alt="Project 4 preview" loading="lazy">
-          <figcaption>Visualization</figcaption>
-        </figure>
-      </div>
-
-      <!-- OPTIONAL: quick editable buttons -->
-      <div class="heroActions">
-        <a class="btn" href="#work">View flipbook</a>
-        <a class="btn btnGhost" href="./portfolio.pdf" target="_blank" rel="noopener">Open PDF</a>
-      </div>
-    </section>
-
-    <!-- =========================
-         FLIPBOOK SECTION
-         This is your existing viewer
-    ========================== -->
-    <section class="work" id="work">
-      <div class="bookWrap" id="bookWrap">
-        <div id="book" class="book" aria-label="Portfolio flipbook"></div>
-
-        <button id="prevBtn" class="nav navLeft" type="button" aria-label="Previous page">‹</button>
-        <button id="nextBtn" class="nav navRight" type="button" aria-label="Next page">›</button>
-
-        <div id="loading" class="loading">Loading…</div>
-      </div>
-
-      <div class="footer">
-        <div id="pageLabel" class="pageLabel" aria-live="polite"></div>
-      </div>
-
-      <div id="errorBox" class="errorBox" hidden></div>
-    </section>
-
-    <!-- =========================
-         CONTACT SECTION
-         Edit anytime
-    ========================== -->
-    <section class="contact" id="contact">
-      <h2>Contact</h2>
-      <p>Email: <a href="mailto:YOUR_EMAIL@domain.com">YOUR_EMAIL@domain.com</a></p>
-      <p>LinkedIn: <a href="#" target="_blank" rel="noopener">Add link</a></p>
-    </section>
+    <div id="errorBox" class="errorBox" hidden></div>
   </main>
 
-  <!-- PDF.js -->
+  <!-- PDF.js (stable) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc =
       "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
   </script>
 
-  <!-- PageFlip -->
+  <!-- PageFlip (GH Pages-friendly CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 
   <script src="script.js"></script>
