@@ -49,6 +49,11 @@ async function renderPageToDiv(pdfDoc, pageNum, div) {
   div.appendChild(canvas);
 }
 
+/**
+ * We render all pages first (no countdown, just a loading overlay),
+ * then initialize PageFlip with stable sizing.
+ * This avoids the hover-corner “glitch” caused by mode switching/empty pages.
+ */
 async function init() {
   try {
     errorBox.hidden = true;
@@ -57,6 +62,7 @@ async function init() {
     prevBtn.disabled = true;
     nextBtn.disabled = true;
 
+    // Quick check: PDF must be reachable from GH Pages
     const res = await fetch(PDF_URL, { cache: "no-store" });
     if (!res.ok) {
       throw new Error(
@@ -75,18 +81,20 @@ async function init() {
     // Create page divs
     const pageDivs = Array.from({ length: totalPages }, () => {
       const d = document.createElement("div");
-      d.className = "pageCanvas"; // CHANGED (was "page")
+      d.className = "page";
       return d;
     });
 
-    // Render all pages
+    // Render all pages (quietly)
     for (let i = 0; i < totalPages; i++) {
+      // no “Rendering 6/30” spam — just keep overlay
       // eslint-disable-next-line no-await-in-loop
       await renderPageToDiv(pdfDoc, i + 1, pageDivs[i]);
     }
 
     // Initialize flipbook
     pageFlip = new St.PageFlip(bookEl, {
+      // These are SINGLE-PAGE dimensions; the spread is handled by the library.
       width: 1400,
       height: 990,
 
@@ -96,8 +104,8 @@ async function init() {
       minHeight: 450,
       maxHeight: 3000,
 
-      showCover: true,
-      usePortrait: false,
+      showCover: true,      // cover single page at start/end (closed book feel)
+      usePortrait: false,   // IMPORTANT: never switch into single-page mode mid-book
       autoSize: true,
 
       maxShadowOpacity: 0.22,
@@ -108,6 +116,7 @@ async function init() {
 
     pageFlip.loadFromHTML(pageDivs);
 
+    // Events + controls
     pageFlip.on("flip", (e) => updateUI(e.data));
     updateUI(0);
 
@@ -124,7 +133,9 @@ async function init() {
       try { pageFlip.update(); } catch (_) {}
     });
 
+    // Done
     loadingEl.style.display = "none";
+
   } catch (err) {
     console.error(err);
     showError(String(err?.message || err));
